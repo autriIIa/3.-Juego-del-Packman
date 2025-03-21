@@ -1,14 +1,12 @@
 """Pacman, classic arcade game.
 
 Exercises
-
-1. Change the board.
-2. Change the number of ghosts.
-3. Change where pacman starts.
-4. Make the ghosts faster/slower.
-5. Make the ghosts smarter.
+1.⁠ ⁠Change the board.
+2.⁠ ⁠Change the number of ghosts.
+3.⁠ ⁠Change where pacman starts.
+4.⁠ ⁠Make the ghosts faster/slower.
+5.⁠ ⁠Make the ghosts smarter.
 """
-
 from random import choice
 from turtle import *
 from freegames import floor, vector
@@ -19,11 +17,13 @@ writer = Turtle(visible=False)
 aim = vector(5, 0)
 pacman = vector(-40, 0)  
 ghosts = [
-    [vector(-180, 160), vector(10, 0)],
-    [vector(-180, -160), vector(0, 10)],
-    [vector(100, 160), vector(0, -10)],
-    [vector(100, -160), vector(-10, 0)],
+    [vector(-180, 160), vector(35, 0)],
+    [vector(-180, -160), vector(0, 35)],
+    [vector(100, 160), vector(0, -35)],
+    [vector(100, -160), vector(-35, 0)],
 ]
+directions = [vector(5, 0), vector(-5, 0), vector(0, 5), vector(0, -5)]
+
 # fmt: off
 tiles = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -134,14 +134,29 @@ def move():
             point.move(course)
         else:
             options = [
-                vector(5, 0),
-                vector(-5, 0),
-                vector(0, 5),
-                vector(0, -5),
+                vector(35, 0),
+                vector(-35, 0),
+                vector(0, 35),
+                vector(0, -35),
             ]
             plan = choice(options)
             course.x = plan.x
             course.y = plan.y
+            best_option = None
+            best_distance = float('inf')
+
+            for option in directions:
+                new_pos = point + option
+                distance = abs(new_pos.x - pacman.x) + \
+                    abs(new_pos.y - pacman.y)
+
+                if valid(new_pos) and distance < best_distance:
+                    best_option = option
+                    best_distance = distance
+
+            if best_option:
+                course.x = best_option.x
+                course.y = best_option.y
 
         up()
         goto(point.x + 10, point.y + 10)
